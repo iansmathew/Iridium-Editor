@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Text.RegularExpressions; 
 
 public class GameobjectWindow : MonoBehaviour
 {
@@ -14,19 +15,24 @@ public class GameobjectWindow : MonoBehaviour
     float windowWidth = 300;
     [SerializeField]
     float windowHeight = 200;
+    [SerializeField]
+    float scrollViewHeight = 500;
+    Vector2 scrollPosition = Vector2.zero;
 
     //Component Properties
-    bool hasTransform = false;
+    bool hasTransform = true;
     bool hasRigidbody = false;
     bool hasScript = false;
     bool hasRenderer = false;
     bool hasAudio = false;
     string userFeedbackText = "Add a component";
 
+    //Component Details
+    TransformDetails transformDetails;
 
     private void Start()
     {
-        
+        transformDetails = new TransformDetails(Vector2.zero, Vector2.zero);
     }
 
     private void OnGUI()
@@ -56,11 +62,14 @@ public class GameobjectWindow : MonoBehaviour
         float buttonWidth = windowWidth * 0.5f;
         float buttonHeight = 50.0f;
         float yOrderIndex = 0;
+        float lastItemYnHeight = 0;
 
+        scrollPosition = GUI.BeginScrollView(new Rect(0, 0, windowWidth, windowHeight), scrollPosition, new Rect(0, 0, windowWidth + 1, scrollViewHeight));
 
         //Close window toggle
         bShowWindow0 = GUI.Toggle(new Rect(0, 0, 50, 15), bShowWindow0, "Close");
 
+        #region MAIN_WINDOW_REQUIRED_ITEMS
         //Delete button
         if (GUI.Button(new Rect(leftColX, yOffset + buttonHeight * yOrderIndex, buttonWidth, buttonHeight), "Delete"))
         {
@@ -75,17 +84,54 @@ public class GameobjectWindow : MonoBehaviour
 
         //Next row
         yOrderIndex++;
+        lastItemYnHeight = yOffset + buttonHeight * yOrderIndex + buttonHeight;
 
-        float componentLabelYPos = yOffset + buttonHeight * yOrderIndex;
+
+        float componentLabelYPos = lastItemYnHeight;
         GUI.Label(new Rect(windowWidth * 0.3f, componentLabelYPos, windowWidth * 0.6f, 50.0f), "Component Details");
+        #endregion
 
-        float detailsYStartPos = componentLabelYPos + 50.0f;
+        //New row
+        lastItemYnHeight = componentLabelYPos + 50.0f;
 
+        #region TRANSFORM_COMPONENT_DETAILS
         if (hasTransform)
         {
-            GUI.Label(new Rect(0, detailsYStartPos, windowWidth, 50), "Transform Component");
+            float detailsYStartPos = lastItemYnHeight;
 
+            GUI.Label(new Rect(10, detailsYStartPos, windowWidth, 20), "Transform Component");
+
+            //Remove button
+            float deleteButtonWidth = 30;
+            if (GUI.Button(new Rect(windowWidth - (2 * deleteButtonWidth) , detailsYStartPos, deleteButtonWidth, 20), "X"))
+                hasTransform = false;
+
+            //Position
+            GUI.Label(new Rect(10, detailsYStartPos + 20, 100, 50), "Position: ");
+
+            transformDetails.posX = GUI.TextField(new Rect(100, detailsYStartPos + 20, 80, 20), transformDetails.posX);
+            transformDetails.posX = Regex.Replace(transformDetails.posX, @"[^0-9]", ""); //Restricting text field to numbers
+
+            transformDetails.posY = GUI.TextField(new Rect(100 + 80, detailsYStartPos + 20, 80, 20), transformDetails.posY);
+            transformDetails.posY = Regex.Replace(transformDetails.posY, @"[^0-9]", ""); //Restricting text field to numbers
+
+            //Scale
+            float scaleStartY = detailsYStartPos + 50;
+            GUI.Label(new Rect(10, scaleStartY, 100, 50), "Scale: ");
+
+            transformDetails.scaleX = GUI.TextField(new Rect(100, scaleStartY, 80, 20), transformDetails.scaleX);
+            transformDetails.scaleX = Regex.Replace(transformDetails.scaleX, @"[^0-9]", ""); //Restricting text field to numbers
+
+            transformDetails.scaleY = GUI.TextField(new Rect(100 + 80, scaleStartY, 80, 20), transformDetails.scaleY);
+            transformDetails.scaleY = Regex.Replace(transformDetails.scaleY, @"[^0-9]", ""); //Restricting text field to numbers
+
+            lastItemYnHeight = scaleStartY + 20;
         }
+        #endregion
+
+        GUI.EndScrollView();
+
+        GUI.DragWindow();
     }
 
     /// <summary>
@@ -104,6 +150,8 @@ public class GameobjectWindow : MonoBehaviour
 
 
         bShowWindow1 = GUI.Toggle(new Rect(0, 0, 50, yOffset), bShowWindow1, "Close");
+
+        #region COMPONENT_BUTTONS
 
         if (GUI.Button(new Rect(leftColX, yOffset + buttonHeight * yOrderIndex, buttonWidth, buttonHeight), "Transform"))
         {
@@ -161,12 +209,21 @@ public class GameobjectWindow : MonoBehaviour
             userFeedbackText = "Script added.";
         }
 
+        #endregion
+
         //Next row
         yOrderIndex++;
 
         GUI.Label(new Rect(windowWidth * 0.25f, yOffset + (buttonHeight * yOrderIndex), windowWidth * 0.66f, 50), userFeedbackText);
+
+        GUI.DragWindow();
     }
 
+    /// <summary>
+    /// Given a window enum, sets it to visible or not
+    /// </summary>
+    /// <param name="_windowView"></param>
+    /// <param name="_visibility"></param>
     public void SetWindowVisibility(EWindowIds _windowView, bool _visibility = true)
     {
         switch(_windowView)

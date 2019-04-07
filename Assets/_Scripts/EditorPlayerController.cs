@@ -8,6 +8,7 @@ public class EditorPlayerController : MonoBehaviour
     [Header("Editor Properties")]
     [SerializeField]
     private LayerMask doubleClickLayerMask;
+    
 
     //Misc References
     private float lastClickTime = 0;

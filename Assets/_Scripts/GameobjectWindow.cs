@@ -7,6 +7,7 @@ public class GameobjectWindow : MonoBehaviour
 {
     //Gameobject Properties
     string irName = "Gameobject";
+    Vector2 positionOffset;
 
     //Window properties
     bool bShowWindow0 = false;
@@ -27,12 +28,37 @@ public class GameobjectWindow : MonoBehaviour
     bool hasAudio = false;
     string userFeedbackText = "Add a component";
 
+    //Transform window properties
+    string posX = "0";
+    string posY = "0";
+    string scaleX = "1";
+    string scaleY = "1";
+
     //Component Details
     TransformDetails transformDetails;
 
     private void Start()
     {
-        transformDetails = new TransformDetails(Vector2.zero, Vector2.zero);
+        //positionOffset = Camera.main.GetComponent<SetCameraPositon>().worldExtents;
+
+        //Set window detail values to whatever on instantiate
+        posX = transform.position.x.ToString();
+        posY = transform.position.y.ToString();
+        scaleX = transform.localScale.x.ToString();
+        scaleY = transform.localScale.y.ToString();
+
+        //Set default detail values to on instantiate values
+        transformDetails = new TransformDetails(transform.position, transform.localScale);
+
+    }
+
+    private void Update()
+    {
+        Vector2 setPosition = new Vector2(transformDetails.posX, transformDetails.posY); //apply camera offset to "simulate" top left origin
+        Vector2 setScale = new Vector2(transformDetails.scaleX, transformDetails.scaleY);
+
+        transform.position = setPosition;
+        transform.localScale = setScale;
     }
 
     private void OnGUI()
@@ -109,23 +135,30 @@ public class GameobjectWindow : MonoBehaviour
             //Position
             GUI.Label(new Rect(10, detailsYStartPos + 20, 100, 50), "Position: ");
 
-            transformDetails.posX = GUI.TextField(new Rect(100, detailsYStartPos + 20, 80, 20), transformDetails.posX);
-            transformDetails.posX = Regex.Replace(transformDetails.posX, @"[^0-9]", ""); //Restricting text field to numbers
+            posX = GUI.TextField(new Rect(100, detailsYStartPos + 20, 80, 20), posX);
+            posX = Regex.Replace(posX, @"[^0-9]", ""); //Restricting text field to numbers
 
-            transformDetails.posY = GUI.TextField(new Rect(100 + 80, detailsYStartPos + 20, 80, 20), transformDetails.posY);
-            transformDetails.posY = Regex.Replace(transformDetails.posY, @"[^0-9]", ""); //Restricting text field to numbers
+            posY = GUI.TextField(new Rect(100 + 80, detailsYStartPos + 20, 80, 20), posY);
+            posY = Regex.Replace(posY, @"[^0-9]", ""); //Restricting text field to numbers
 
             //Scale
             float scaleStartY = detailsYStartPos + 50;
             GUI.Label(new Rect(10, scaleStartY, 100, 50), "Scale: ");
 
-            transformDetails.scaleX = GUI.TextField(new Rect(100, scaleStartY, 80, 20), transformDetails.scaleX);
-            transformDetails.scaleX = Regex.Replace(transformDetails.scaleX, @"[^0-9]", ""); //Restricting text field to numbers
+            scaleX = GUI.TextField(new Rect(100, scaleStartY, 80, 20), scaleX);
+            scaleX = Regex.Replace(scaleX, @"[^0-9]", ""); //Restricting text field to numbers
 
-            transformDetails.scaleY = GUI.TextField(new Rect(100 + 80, scaleStartY, 80, 20), transformDetails.scaleY);
-            transformDetails.scaleY = Regex.Replace(transformDetails.scaleY, @"[^0-9]", ""); //Restricting text field to numbers
+            scaleY = GUI.TextField(new Rect(100 + 80, scaleStartY, 80, 20), scaleY);
+            scaleY = Regex.Replace(scaleY, @"[^0-9]", ""); //Restricting text field to numbers
+
+            //Apply values
+            transformDetails.posX = int.Parse(posX);
+            transformDetails.posY = int.Parse(posY);
+            transformDetails.scaleX = int.Parse(scaleX);
+            transformDetails.scaleY = int.Parse(scaleY);
 
             lastItemYnHeight = scaleStartY + 20;
+            
         }
         #endregion
 

@@ -3,17 +3,17 @@
 [System.Serializable]
 public struct TransformDetails
 {
-    public string posX;
-    public string posY;
-    public string scaleX;
-    public string scaleY;
+    public int posX;
+    public int posY;
+    public int scaleX;
+    public int scaleY;
     
     public TransformDetails(Vector2 _pos, Vector2 _scale)
     {
-        posX = _pos.x.ToString();
-        posY = _pos.y.ToString();
+        posX = (int)_pos.x;
+        posY = (int)_pos.y;
 
-        scaleX = _scale.x.ToString();
-        scaleY = _scale.y.ToString();
+        scaleX = (int)_scale.x;
+        scaleY = (int)_scale.y;
     }
 }

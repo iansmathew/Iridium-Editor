@@ -17,3 +17,18 @@ public struct TransformDetails
         scaleY = (int)_scale.y;
     }
 }
+
+[System.Serializable]
+public struct RigidbodyDetails
+{
+    public float mass;
+    public bool isEnabled;
+    public bool isAffectedByGravity;
+
+    public RigidbodyDetails(float _mass = 1.0f, bool _isEnabled = true, bool _isAffectedByGravity = true)
+    {
+        mass = _mass;
+        isEnabled = _isEnabled;
+        isAffectedByGravity = _isAffectedByGravity;
+    }
+}

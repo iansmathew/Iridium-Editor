@@ -34,19 +34,32 @@ public class GameobjectWindow : MonoBehaviour
     string scaleX = "1";
     string scaleY = "1";
 
+    //Rigidbody window properties
+    string mass = "1";
+    bool rbIsEnabled = true;
+    bool rbIsAffectedByGravity = true;
+
     //Component Details
     TransformDetails transformDetails;
+    RigidbodyDetails rigidbodyDetails;
 
     private void Start()
     {
-        //Set window detail values to whatever on instantiate
-        posX = transform.position.x.ToString();
-        posY = transform.position.y.ToString();
-        scaleX = transform.localScale.x.ToString();
-        scaleY = transform.localScale.y.ToString();
-
         //Set default detail values to on instantiate values
         transformDetails = new TransformDetails(new Vector2(transform.position.x, -transform.position.y), transform.localScale); //flip y to correct for unity origin
+        rigidbodyDetails = new RigidbodyDetails(1.0f);
+
+        //Set window properties to constructed struct values
+        //Set window detail values to whatever on instantiate
+        posX = transformDetails.posX.ToString();
+        posY = transformDetails.posY.ToString();
+        scaleX = transformDetails.scaleX.ToString();
+        scaleY = transformDetails.scaleY.ToString();
+
+        mass = rigidbodyDetails.mass.ToString();
+        rbIsAffectedByGravity = rigidbodyDetails.isAffectedByGravity;
+        rbIsEnabled = rigidbodyDetails.isEnabled;
+
     }
 
     private void Update()
@@ -158,6 +171,47 @@ public class GameobjectWindow : MonoBehaviour
             lastItemYnHeight = scaleStartY + 20;
             
         }
+        #endregion
+
+        #region RIGIDBODY_COMPONENT_DETAILS
+
+        if (hasRigidbody)
+        {
+            GUI.Label(new Rect(10, lastItemYnHeight, windowWidth, 20), "Rigidbody Component");
+
+            //Remove button
+            float deleteButtonWidth = 30;
+            if (GUI.Button(new Rect(windowWidth - (2 * deleteButtonWidth), lastItemYnHeight, deleteButtonWidth, 20), "X"))
+                hasRigidbody = false;
+
+            lastItemYnHeight += 20;
+            GUI.Label(new Rect(10, lastItemYnHeight, 100, 50), "Mass: ");
+
+            //Mass
+            mass = GUI.TextField(new Rect(100, lastItemYnHeight, 80, 20), mass);
+            mass = Regex.Replace(mass, @"[^0-9]", ""); //Restricting text field to numbers
+
+            //Is enabled toggle
+            lastItemYnHeight += 20;
+            GUI.Label(new Rect(10, lastItemYnHeight, 100, 50), "Is enabled: ");
+            rbIsEnabled = GUI.Toggle(new Rect(100, lastItemYnHeight, 50, 15), rbIsEnabled, "");
+
+            //Is affected by gravity
+            lastItemYnHeight += 20;
+            GUI.Label(new Rect(10, lastItemYnHeight, 100, 50), "Apply gravity: ");
+            rbIsAffectedByGravity = GUI.Toggle(new Rect(100, lastItemYnHeight, 50, 15), rbIsAffectedByGravity, "");
+
+            //Apply values
+            rigidbodyDetails.mass = float.Parse(mass);
+            rigidbodyDetails.isEnabled = rbIsEnabled;
+            rigidbodyDetails.isAffectedByGravity = rbIsAffectedByGravity;
+
+        }
+
+        #endregion
+
+        #region RENDERER_COMPONENT_DETAILS
+
         #endregion
 
         GUI.EndScrollView();

@@ -29,8 +29,8 @@ public class GameobjectWindow : MonoBehaviour
     string userFeedbackText = "Add a component";
 
     //Transform window properties
-    string posX = "0";
-    string posY = "0";
+    string posX = "400";
+    string posY = "300";
     string scaleX = "1";
     string scaleY = "1";
 
@@ -39,8 +39,6 @@ public class GameobjectWindow : MonoBehaviour
 
     private void Start()
     {
-        //positionOffset = Camera.main.GetComponent<SetCameraPositon>().worldExtents;
-
         //Set window detail values to whatever on instantiate
         posX = transform.position.x.ToString();
         posY = transform.position.y.ToString();
@@ -48,14 +46,14 @@ public class GameobjectWindow : MonoBehaviour
         scaleY = transform.localScale.y.ToString();
 
         //Set default detail values to on instantiate values
-        transformDetails = new TransformDetails(transform.position, transform.localScale);
-
+        transformDetails = new TransformDetails(new Vector2(transform.position.x, -transform.position.y), transform.localScale); //flip y to correct for unity origin
     }
 
     private void Update()
     {
-        Vector2 setPosition = new Vector2(transformDetails.posX, transformDetails.posY); //apply camera offset to "simulate" top left origin
-        Vector2 setScale = new Vector2(transformDetails.scaleX, transformDetails.scaleY);
+        //Unity origin is centered, Iridium is top left, hence we apply changes to visually correct this.
+        Vector2 setPosition = new Vector2(transformDetails.posX, -transformDetails.posY); //apply camera offset to "simulate" top left origin
+        Vector2 setScale = new Vector2(transformDetails.scaleX * 50.0f, transformDetails.scaleY * 50.0f);
 
         transform.position = setPosition;
         transform.localScale = setScale;

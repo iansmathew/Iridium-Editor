@@ -1,7 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.Text.RegularExpressions; 
+using System.Text.RegularExpressions;
+using Crosstales.FB;
+using System.IO;
 
 public class GameobjectWindow : MonoBehaviour
 {
@@ -39,15 +41,20 @@ public class GameobjectWindow : MonoBehaviour
     bool rbIsEnabled = true;
     bool rbIsAffectedByGravity = true;
 
+    //Renderer window properties
+    bool rIsRendered = true;
+
     //Component Details
     TransformDetails transformDetails;
     RigidbodyDetails rigidbodyDetails;
+    RendererDetails rendererDetails;
 
     private void Start()
     {
         //Set default detail values to on instantiate values
         transformDetails = new TransformDetails(new Vector2(transform.position.x, -transform.position.y), transform.localScale); //flip y to correct for unity origin
         rigidbodyDetails = new RigidbodyDetails(1.0f);
+        rendererDetails = new RendererDetails();
 
         //Set window properties to constructed struct values
         //Set window detail values to whatever on instantiate
@@ -59,6 +66,8 @@ public class GameobjectWindow : MonoBehaviour
         mass = rigidbodyDetails.mass.ToString();
         rbIsAffectedByGravity = rigidbodyDetails.isAffectedByGravity;
         rbIsEnabled = rigidbodyDetails.isEnabled;
+
+        rIsRendered = rendererDetails.isRendered;
 
     }
 
@@ -206,12 +215,60 @@ public class GameobjectWindow : MonoBehaviour
             rigidbodyDetails.isEnabled = rbIsEnabled;
             rigidbodyDetails.isAffectedByGravity = rbIsAffectedByGravity;
 
+            lastItemYnHeight += 20;
         }
 
         #endregion
 
         #region RENDERER_COMPONENT_DETAILS
 
+        if (hasRenderer)
+        {
+            GUI.Label(new Rect(10, lastItemYnHeight, windowWidth, 20), "Render Component");
+
+            //Remove button
+            float deleteButtonWidth = 30;
+            if (GUI.Button(new Rect(windowWidth - (2 * deleteButtonWidth), lastItemYnHeight, deleteButtonWidth, 20), "X"))
+                hasRenderer = false;
+
+            lastItemYnHeight += 20;
+
+            //Set sprite button
+            if (GUI.Button(new Rect(10, lastItemYnHeight, 100, 50), "Set sprite"))
+            {
+                string spritePath = FileBrowser.OpenSingleFile();
+
+                //Create texture from path
+                Texture2D tex = new Texture2D(2, 2);
+                byte[] fileData;
+
+                if (File.Exists(spritePath))
+                {
+                    fileData = File.ReadAllBytes(spritePath);
+                    bool loadResult = tex.LoadImage(fileData);
+                    Debug.Assert(loadResult);
+
+                    //Get old references
+                    SpriteRenderer renderer = GetComponent<SpriteRenderer>();
+                    Sprite newSprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
+
+                    //Update sprite and collider
+                    renderer.sprite = newSprite;
+                    GetComponent<BoxCollider>().size = renderer.sprite.bounds.size;
+
+                    //Apply values 
+                    rendererDetails.imagePath = spritePath;
+                }
+            }
+
+            //Is enabled toggle
+            lastItemYnHeight += 50 + 20;
+            GUI.Label(new Rect(10, lastItemYnHeight, 100, 50), "Is rendered: ");
+            rIsRendered = GUI.Toggle(new Rect(100, lastItemYnHeight, 50, 15), rIsRendered, "");
+
+            //Apply values
+            rendererDetails.isRendered = rIsRendered;
+        }
         #endregion
 
         GUI.EndScrollView();

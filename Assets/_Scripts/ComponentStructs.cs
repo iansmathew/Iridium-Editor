@@ -32,3 +32,15 @@ public struct RigidbodyDetails
         isAffectedByGravity = _isAffectedByGravity;
     }
 }
+
+public struct RendererDetails
+{
+    public bool isRendered;
+    public string imagePath;
+
+    public RendererDetails(bool _isRendered = true)
+    {
+        isRendered = _isRendered;
+        imagePath = "";
+    }
+}

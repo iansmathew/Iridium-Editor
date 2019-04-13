@@ -1,4 +1,12 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+[System.Serializable]
+public struct NameDetails
+{
+    public string name;
+}
 
 [System.Serializable]
 public struct TransformDetails
@@ -33,6 +41,7 @@ public struct RigidbodyDetails
     }
 }
 
+[System.Serializable]
 public struct RendererDetails
 {
     public bool isRendered;
@@ -42,5 +51,18 @@ public struct RendererDetails
     {
         isRendered = _isRendered;
         imagePath = "";
+    }
+}
+
+[System.Serializable]
+public struct AudioDetails
+{
+    public string[] clipNames;
+    public string[] clipPaths;
+
+    public AudioDetails(int _clipCount = 0)
+    {
+        clipNames = new string[_clipCount];
+        clipPaths = new string[_clipCount];
     }
 }

@@ -17,4 +17,9 @@ public class EditorManager : MonoBehaviour
     {
         var go = Instantiate(IRGameobject, new Vector3(Camera.main.transform.position.x, Camera.main.transform.position.y, 0), Quaternion.identity);
     }
+
+    public void SaveScene()
+    {
+
+    }
 }

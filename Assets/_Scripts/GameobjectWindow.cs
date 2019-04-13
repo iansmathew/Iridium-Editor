@@ -8,7 +8,6 @@ using System.IO;
 public class GameobjectWindow : MonoBehaviour
 {
     //Gameobject Properties
-    string irName = "Gameobject";
     Vector2 positionOffset;
 
     //Window properties
@@ -31,6 +30,7 @@ public class GameobjectWindow : MonoBehaviour
     string userFeedbackText = "Add a component";
 
     //Transform window properties
+    string irName = "Gameobject";
     string posX = "400";
     string posY = "300";
     string scaleX = "1";
@@ -44,17 +44,28 @@ public class GameobjectWindow : MonoBehaviour
     //Renderer window properties
     bool rIsRendered = true;
 
+    //Audio window properties
+    public int audioFileCount =  0;
+    public string[] audioClipNames;
+    public string[] audioClipPaths;
+
     //Component Details
+    NameDetails nameDetails;
     TransformDetails transformDetails;
     RigidbodyDetails rigidbodyDetails;
     RendererDetails rendererDetails;
+    AudioDetails audioDetails;
 
     private void Start()
     {
         //Set default detail values to on instantiate values
+        nameDetails = new NameDetails();
         transformDetails = new TransformDetails(new Vector2(transform.position.x, -transform.position.y), transform.localScale); //flip y to correct for unity origin
         rigidbodyDetails = new RigidbodyDetails(1.0f);
-        rendererDetails = new RendererDetails();
+        rendererDetails = new RendererDetails(true);
+        audioDetails = new AudioDetails(3);
+
+        nameDetails.name = "Gameobject";
 
         //Set window properties to constructed struct values
         //Set window detail values to whatever on instantiate
@@ -68,6 +79,15 @@ public class GameobjectWindow : MonoBehaviour
         rbIsEnabled = rigidbodyDetails.isEnabled;
 
         rIsRendered = rendererDetails.isRendered;
+
+        audioClipNames = new string[3];
+        audioClipPaths = new string[3];
+
+        for (int i = 0; i < audioClipNames.Length; i++)
+        {
+            audioClipNames[i] = "NewClip" + i;
+            audioClipPaths[i] = "null";
+        }
 
     }
 
@@ -110,7 +130,7 @@ public class GameobjectWindow : MonoBehaviour
         float yOrderIndex = 0;
         float lastItemYnHeight = 0;
 
-        scrollPosition = GUI.BeginScrollView(new Rect(0, 0, windowWidth, windowHeight), scrollPosition, new Rect(0, 0, windowWidth + 1, scrollViewHeight));
+        scrollPosition = GUI.BeginScrollView(new Rect(0, 0, windowWidth, windowHeight), scrollPosition, new Rect(0, 0, windowWidth + 1, scrollViewHeight + 300));
 
         //Close window toggle
         bShowWindow0 = GUI.Toggle(new Rect(0, 0, 50, 15), bShowWindow0, "Close");
@@ -138,7 +158,17 @@ public class GameobjectWindow : MonoBehaviour
         #endregion
 
         //New row
-        lastItemYnHeight = componentLabelYPos + 50.0f;
+        lastItemYnHeight = componentLabelYPos + 30.0f;
+
+        //Name
+        GUI.Label(new Rect(10, lastItemYnHeight, windowWidth, 20), "Name: ");
+        irName = GUI.TextField(new Rect(100, lastItemYnHeight, 80, 20), irName);
+        irName = Regex.Replace(irName, @"[^a-zA-Z]", ""); //Restricting text field to numbers
+
+        //Apply values
+        nameDetails.name = irName;
+
+        lastItemYnHeight += 30;
 
         #region TRANSFORM_COMPONENT_DETAILS
         if (hasTransform)
@@ -182,6 +212,8 @@ public class GameobjectWindow : MonoBehaviour
         }
         #endregion
 
+        lastItemYnHeight += 10;
+
         #region RIGIDBODY_COMPONENT_DETAILS
 
         if (hasRigidbody)
@@ -219,6 +251,8 @@ public class GameobjectWindow : MonoBehaviour
         }
 
         #endregion
+
+        lastItemYnHeight += 10;
 
         #region RENDERER_COMPONENT_DETAILS
 
@@ -259,16 +293,84 @@ public class GameobjectWindow : MonoBehaviour
                     //Apply values 
                     rendererDetails.imagePath = spritePath;
                 }
+
             }
 
             //Is enabled toggle
-            lastItemYnHeight += 50 + 20;
+            lastItemYnHeight += 50;
             GUI.Label(new Rect(10, lastItemYnHeight, 100, 50), "Is rendered: ");
             rIsRendered = GUI.Toggle(new Rect(100, lastItemYnHeight, 50, 15), rIsRendered, "");
 
             //Apply values
             rendererDetails.isRendered = rIsRendered;
+
+            Debug.Log(rendererDetails.isRendered);
+
+            lastItemYnHeight += 20;
         }
+        #endregion
+
+        lastItemYnHeight += 10;
+
+        #region AUDIO_COMPONENT_DETAILS
+
+        if (hasAudio)
+        {
+            GUI.Label(new Rect(10, lastItemYnHeight, windowWidth, 20), "Audio Component");
+
+            // Remove button
+            float deleteButtonWidth = 30;
+            if (GUI.Button(new Rect(windowWidth - (2 * deleteButtonWidth), lastItemYnHeight, deleteButtonWidth, 20), "X"))
+                hasAudio = false;
+
+            lastItemYnHeight += 20 + 20;
+
+            if (GUI.Button(new Rect(10, lastItemYnHeight, 100, 50), "Add audio clip"))
+            {
+                if (audioFileCount < 3)
+                    audioFileCount++;
+            }
+
+            if (GUI.Button(new Rect(10 + 110, lastItemYnHeight, 100, 50), "Delete audio clip"))
+            {
+                if (audioFileCount > 0)
+                {
+                    //Null the added clip
+                    audioClipNames[audioFileCount - 1] = "null";
+                    audioClipPaths[audioFileCount - 1] = "null";
+
+                    audioFileCount--;
+                }
+            }
+
+            lastItemYnHeight += 50 + 20;
+
+            for (int i = 0; i < audioFileCount; i++)
+            {
+                //Display clip number
+                GUI.Label(new Rect(10, lastItemYnHeight, windowWidth, 20), "Sound " + i);
+
+                audioClipNames[i] = GUI.TextField(new Rect(100, lastItemYnHeight, 80, 20), audioClipNames[i]);
+                audioClipNames[i] = Regex.Replace(audioClipNames[i], @"[^a-zA-Z]", "");
+
+                if (GUI.Button(new Rect(200, lastItemYnHeight - 5, 100, 30), "Set sound clip"))
+                {
+                    string path = FileBrowser.OpenSingleFile();
+
+                    if (File.Exists(path))
+                    {
+                        audioClipPaths[i] = path;
+                    }
+                }
+
+                lastItemYnHeight += 30;
+            }
+
+            //Apply values
+            audioDetails.clipNames = audioClipNames;
+            audioDetails.clipPaths = audioClipPaths;
+        }
+
         #endregion
 
         GUI.EndScrollView();
@@ -342,19 +444,19 @@ public class GameobjectWindow : MonoBehaviour
                 userFeedbackText = "Component already exists!";
         }
 
-        //Next row
+        ///Next row
         yOrderIndex++;
 
-        if (GUI.Button(new Rect(leftColX, yOffset + buttonHeight * yOrderIndex, buttonWidth, buttonHeight), "Script"))
-        {
-
-            userFeedbackText = "Script added.";
-        }
+        //if (GUI.Button(new Rect(leftColX, yOffset + buttonHeight * yOrderIndex, buttonWidth, buttonHeight), "Script"))
+        //{
+        //    hasScript = true;
+        //    userFeedbackText = "Script added.";
+        //}
 
         #endregion
 
         //Next row
-        yOrderIndex++;
+        //yOrderIndex++;
 
         GUI.Label(new Rect(windowWidth * 0.25f, yOffset + (buttonHeight * yOrderIndex), windowWidth * 0.66f, 50), userFeedbackText);
 

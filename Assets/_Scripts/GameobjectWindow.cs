@@ -22,11 +22,11 @@ public class GameobjectWindow : MonoBehaviour
     Vector2 scrollPosition = Vector2.zero;
 
     //Component Properties
-    bool hasTransform = true;
-    bool hasRigidbody = false;
-    bool hasScript = false;
-    bool hasRenderer = false;
-    bool hasAudio = false;
+    public bool hasTransform = true;
+    public bool hasRigidbody = false;
+    public bool hasScript = false;
+    public bool hasRenderer = false;
+    public bool hasAudio = false;
     string userFeedbackText = "Add a component";
 
     //Transform window properties
@@ -50,11 +50,11 @@ public class GameobjectWindow : MonoBehaviour
     public string[] audioClipPaths;
 
     //Component Details
-    NameDetails nameDetails;
-    TransformDetails transformDetails;
-    RigidbodyDetails rigidbodyDetails;
-    RendererDetails rendererDetails;
-    AudioDetails audioDetails;
+    public NameDetails nameDetails;
+    public TransformDetails transformDetails;
+    public RigidbodyDetails rigidbodyDetails;
+    public RendererDetails rendererDetails;
+    public AudioDetails audioDetails;
 
     private void Start()
     {

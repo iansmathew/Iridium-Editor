@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 106173162088008125}
   m_Layer: 8
   m_Name: IRGameobject
-  m_TagString: Untagged
+  m_TagString: XMLGameobject
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -96,6 +96,9 @@ MonoBehaviour:
   windowWidth: 350
   windowHeight: 500
   scrollViewHeight: 500
+  audioFileCount: 0
+  audioClipNames: []
+  audioClipPaths: []
 --- !u!65 &106173162088008125
 BoxCollider:
   m_ObjectHideFlags: 0

@@ -821,7 +821,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Spawn Scene
+  m_Text: Save Scene
 --- !u!222 &1789739359
 CanvasRenderer:
   m_ObjectHideFlags: 0
